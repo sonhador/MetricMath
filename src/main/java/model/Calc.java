@@ -218,7 +218,7 @@ public class Calc {
 				} else if (isNonDecimal(val1) && isNonDecimal(val2) == false) {
 					return Integer.parseInt(val1.toString()) < Double.parseDouble(val2.toString());
 				} else if (isNonDecimal(val2) == false && isNonDecimal(val2)) {
-					return Double.parseDouble(val1.toString()) < (int)val2;
+					return Double.parseDouble(val1.toString()) < Integer.parseInt(val2.toString());
 				} else {
 					return Double.parseDouble(val1.toString()) < Double.parseDouble(val2.toString());
 				}
