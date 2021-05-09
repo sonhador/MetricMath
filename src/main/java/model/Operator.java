@@ -12,8 +12,8 @@ public enum Operator {
 	AND("AND", "&&"),
 	OR("OR", "||");
 	
-	public final String value1;
-	public final String value2;
+	public String value1;
+	public String value2;
 	
 	private Operator(String value) {
 		this.value1 = value;

@@ -345,6 +345,190 @@ public class Calc {
 		return sumList;
 	}
 	
+	private static double calcBinary(Number d1, Number d2, Function function) {
+		switch (function) {
+		case ADD:
+			if (isNonDecimal(d1) && isNonDecimal(d2)) {
+				return d1.longValue() + d2.longValue();
+			} else if (isNonDecimal(d1) && isNonDecimal(d2) == false) {
+				return d1.longValue() + d2.doubleValue();
+			} else if (isNonDecimal(d1) == false && isNonDecimal(d2)) {
+				return d1.doubleValue() + d2.longValue();
+			} else {
+				return d1.doubleValue() + d2.doubleValue();
+			}
+		case SUBTRACT:
+			if (isNonDecimal(d1) && isNonDecimal(d2)) {
+				return d1.longValue() - d2.longValue();
+			} else if (isNonDecimal(d1) && isNonDecimal(d2) == false) {
+				return d1.longValue() - d2.doubleValue();
+			} else if (isNonDecimal(d1) == false && isNonDecimal(d2)) {
+				return d1.doubleValue() - d2.longValue();
+			} else {
+				return d1.doubleValue() - d2.doubleValue();
+			}
+		case MULTIPLY:
+			if (isNonDecimal(d1) && isNonDecimal(d2)) {
+				return d1.longValue() * d2.longValue();
+			} else if (isNonDecimal(d1) && isNonDecimal(d2) == false) {
+				return d1.longValue() * d2.doubleValue();
+			} else if (isNonDecimal(d1) == false && isNonDecimal(d2)) {
+				return d1.doubleValue() * d2.longValue();
+			} else {
+				return d1.doubleValue() * d2.doubleValue();
+			}
+		case DIVIDE:
+			try {
+				if (isNonDecimal(d1) && isNonDecimal(d2)) {
+					return d1.longValue() / d2.longValue();
+				} else if (isNonDecimal(d1) && isNonDecimal(d2) == false) {
+					return d1.longValue() / d2.doubleValue();
+				} else if (isNonDecimal(d1) == false && isNonDecimal(d2)) {
+					return d1.doubleValue() / d2.longValue();
+				} else {
+					return d1.doubleValue() / d2.doubleValue();
+				}
+			} catch (Exception e) {
+				return Double.MAX_VALUE;
+			}
+		case POWER:
+			return Math.pow(d1.doubleValue(), d2.doubleValue());
+		default:
+			throw new UnsupportedFunctionException(function.name());
+		}
+	}
+	
+	private static ArrayList calcBinary(Number obj1, List obj2, Function function) {
+		ArrayList added = new ArrayList();
+		
+		for (Object obj : obj2) {
+			added.add(calcBinary(					
+				    isNonDecimal(obj) ? 
+				    		Long.parseLong(obj.toString()) : 
+				    		Double.parseDouble(obj.toString()),
+					obj1,
+					function)); 
+		}
+		
+		return added;
+	}
+	
+	private static ArrayList calcBinary(List obj1, List obj2, Function function) {
+		ArrayList added = new ArrayList();
+		int length = Math.max(obj1.size(), obj2.size());
+		
+		for (int i=0; i<length; i++) {
+			Number obj1val;
+			Number obj2val;
+			
+			if (i >= obj1.size()) {
+				obj1val = 0;
+			} else {
+				obj1val = isNonDecimal(obj1.get(i)) ?
+						Long.parseLong(obj1.get(i).toString()) :
+						Double.parseDouble(obj1.get(i).toString());
+			}
+			
+			if (i >= obj2.size()) {
+				obj2val = 0;
+			} else {
+				obj2val = isNonDecimal(obj2.get(i)) ?
+						Long.parseLong(obj2.get(i).toString()) :
+						Double.parseDouble(obj2.get(i).toString());
+			}
+			
+			added.add(calcBinary(obj1val, obj2val, function));
+		}
+		
+		return added;
+	}
+	
+	private static ArrayList[] calcBinary(Number obj1, List[] obj2, Function function) {
+		ArrayList[] added = new ArrayList[obj2.length];
+		
+		int idx=0;
+		for (List obj : obj2) {
+			added[idx++] = calcBinary(obj1, obj, function);
+		}
+		
+		return added;
+	}
+	
+	private static ArrayList[] calcBinary(List obj1, List[] obj2, Function function) {
+		ArrayList[] added = new ArrayList[obj2.length];
+		
+		int idx=0;
+		for (List obj : obj2) {
+			added[idx++] = calcBinary(obj1, obj, function);
+		}
+		
+		return added;
+	}
+	
+	public static Object calcBinary(Object obj1, Object obj2, Function function) {	
+		if (isList(obj1) && isList(obj2)) {
+			return calcBinary((List)obj1, (List)obj2, function);
+		} else if (isList(obj1) && isArray(obj2)) {
+			return calcBinary((List)obj1, (List[])obj2, function);
+		} else if (isArray(obj1) && isList(obj2)) {
+			return calcBinary((List)obj2, (List[])obj1, function);
+		} else if (isList(obj1)) {
+			if (isNonDecimal(obj2)) {
+				return calcBinary(Long.parseLong(obj2.toString()), (List)obj1, function);
+			} else {
+				return calcBinary(Double.parseDouble(obj2.toString()), (List)obj1, function);
+			}
+		} else if (isList(obj2)) {
+			if (isNonDecimal(obj2)) {
+				return calcBinary(Long.parseLong(obj1.toString()), (List)obj2, function);
+			} else {
+				return calcBinary(Double.parseDouble(obj1.toString()), (List)obj2, function);
+			}
+		} else if (isArray(obj1)) {
+			if (isNonDecimal(obj2)) {
+				return calcBinary(Long.parseLong(obj1.toString()), (List[])obj2, function);
+			} else {
+				return calcBinary(Double.parseDouble(obj1.toString()), (List[])obj2, function);
+			}
+		} else if (isArray(obj2)) {
+			if (isNonDecimal(obj2)) {
+				return calcBinary(Long.parseLong(obj1.toString()), (List[])obj2, function);
+			} else {
+				return calcBinary(Double.parseDouble(obj1.toString()), (List[])obj2, function);
+			}
+		} else {
+			if (isNonDecimal(obj1) && isNonDecimal(obj2)) {
+				return calcBinary(Long.parseLong(obj1.toString()), Long.parseLong(obj2.toString()), function);
+			} else if (isNonDecimal(obj1) && isNonDecimal(obj2) == false) {
+				return calcBinary(Long.parseLong(obj1.toString()), Double.parseDouble(obj2.toString()), function);
+			} else if (isNonDecimal(obj1) == false && isNonDecimal(obj2)) {
+				return calcBinary(Double.parseDouble(obj1.toString()), Long.parseLong(obj2.toString()), function);
+			} else {
+				return calcBinary(Double.parseDouble(obj1.toString()), Double.parseDouble(obj2.toString()), function);
+			}
+		}
+	}
+	
+	public static Object ADD(Object obj1, Object obj2) {
+		return calcBinary(obj1, obj2, Function.ADD);
+	}
+	
+	public static Object SUBTRACT(Object obj1, Object obj2) {
+		return calcBinary(obj1, obj2, Function.SUBTRACT);
+	}
+	
+	public static Object MULTIPY(Object obj1, Object obj2) {
+		return calcBinary(obj1, obj2, Function.MULTIPLY);
+	}
+	
+	public static Object DIVIDE(Object obj1, Object obj2) {
+		return calcBinary(obj1, obj2, Function.DIVIDE);
+	}
+	
+	public static Object POWER(Object obj1, Object obj2) {
+		return calcBinary(obj1, obj2, Function.POWER);
+	}
+	
 	public static Object SUM(Object obj) {
 		if (isList(obj)) {
 			return sum((List)obj);
