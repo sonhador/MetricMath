@@ -125,6 +125,64 @@ public class MetricMath {
 				buf = new StringBuffer();
 				computers.push(""+expr.charAt(i));
 				break;
+			case '=':
+				if (i+1 < expr.length() && expr.charAt(i+1) == '=') {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push("==");
+					i++;
+				}
+				break;
+			case '!':
+				if (i+1 < expr.length() && expr.charAt(i+1) == '=') {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push("!=");
+					i++;
+				}
+				break;
+			case '<':
+				if (i+1 < expr.length() && expr.charAt(i+1) == '=') {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push("<=");
+					i++;
+				} else {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push(""+expr.charAt(i));
+					break;
+				}
+				break;
+			case '>':
+				if (i+1 < expr.length() && expr.charAt(i+1) == '=') {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push(">=");
+					i++;
+				} else {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push(""+expr.charAt(i));
+					break;
+				}
+				break;
+			case '&':
+				if (i+1 < expr.length() && expr.charAt(i+1) == '&') {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push("&&");
+					i++;
+				}
+				break;
+			case '|':
+				if (i+1 < expr.length() && expr.charAt(i+1) == '|') {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+					computers.push("||");
+					i++;
+				}
+				break;
 			case '[':
 				computers.push(""+expr.charAt(i));
 				break;
@@ -200,9 +258,7 @@ public class MetricMath {
 				case ">=":
 				case "<":
 				case ">":
-				case "AND":
 				case "&&":
-				case "OR":
 				case "||":
 					operators.add(computer);
 					break;

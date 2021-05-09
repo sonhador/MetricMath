@@ -40,6 +40,18 @@ public class Calc {
 		}
 	}
 	
+	private static Object numberFirst(Object obj) {
+		try {
+			return Integer.parseInt(obj.toString());
+		} catch (NumberFormatException e) {
+			try {
+				return Double.parseDouble(obj.toString());
+			} catch (NumberFormatException e1) {
+				return obj;
+			}
+		}
+	}
+	
 	private static boolean isBoolean(Object obj) {
 		if (obj.toString().toLowerCase().equals("true") ||
 			obj.toString().toLowerCase().equals("false")) {
@@ -357,7 +369,7 @@ public class Calc {
 		double avg = (double)avg(obj);
 		double sum = (double)obj.stream()
 							    .map(o -> diffSquared(o, avg))
-							    .reduce(0, (v1, v2) -> (double)v1+(double)v2);
+							    .reduce(0, (v1, v2) -> Double.parseDouble(v1.toString())+Double.parseDouble(v2.toString()));
 		return Math.sqrt(sum / obj.size());
 	}
 	
@@ -612,17 +624,17 @@ public class Calc {
 		}
 	}
 	
-	public static Object SLICE(Object obj, int start, int end) {
+	public static Object SLICE(Object obj, Object start, Object end) {
 		if (isArray(obj)) {
-			return slice((Object[])obj, start, end);
+			return slice((Object[])obj, Integer.parseInt(start.toString()), Integer.parseInt(end.toString()));
 		} else {
 			throw new InvalidArgumentException(obj, Function.SLICE);
 		}
 	}
 	
-	public static Object SLICE(Object obj, int start) {
+	public static Object SLICE(Object obj, Object start) {
 		if (isArray(obj)) {
-			return slice((Object[])obj, start);
+			return slice((Object[])obj, Integer.parseInt(start.toString()));
 		} else {
 			throw new InvalidArgumentException(obj, Function.SLICE);
 		}
@@ -683,9 +695,9 @@ public class Calc {
 		
 		if (isBoolean(obj)) {
 			if (Boolean.valueOf(obj.toString())) {
-				newTS.add(v1);
+				newTS.add(numberFirst(v1));
 			} else {
-				newTS.add(v2);
+				newTS.add(numberFirst(v2));
 			}
 		} else if (isList(obj)) {
 			List objList = (List)obj;
@@ -712,10 +724,10 @@ public class Calc {
 					}
 					
 					if (objBool) {
-						newTS.add(v1Obj);
+						newTS.add(numberFirst(v1Obj));
 					} else {
 						if (v2Obj != null) {
-							newTS.add(v2Obj);
+							newTS.add(numberFirst(v2Obj));
 						}
 					}
 				}
@@ -733,9 +745,9 @@ public class Calc {
 					}
 					
 					if (objBool) {
-						newTS.add(v1Obj);
+						newTS.add(numberFirst(v1Obj));
 					} else {
-						newTS.add(v2);
+						newTS.add(numberFirst(v2));
 					}
 				}
 			} else if (isList(v2)) {
@@ -752,10 +764,10 @@ public class Calc {
 					}
 					
 					if (objBool) {
-						newTS.add(v1);
+						newTS.add(numberFirst(v1));
 					} else {
 						if (v2Obj != null) {
-							newTS.add(v2Obj);
+							newTS.add(numberFirst(v2Obj));
 						}
 					}
 				}
@@ -764,9 +776,9 @@ public class Calc {
 					boolean objBool = isTrue(objList.get(i));
 					
 					if (objBool) {
-						newTS.add(v1);
+						newTS.add(numberFirst(v1));
 					} else {
-						newTS.add(v2);
+						newTS.add(numberFirst(v2));
 					}
 				}
 			}
@@ -807,17 +819,17 @@ public class Calc {
 		}
 	}
 	
-	public static ArrayList FIRST(Object[] obj) {
+	public static Object FIRST(Object[] obj) {
 		if (isTS(obj[0])) {
-			return (ArrayList)obj[0];
+			return (Object)obj[0];
 		} else {
 			throw new InvalidArgumentException(obj, Function.FIRST);
 		}
 	}
 	
-	public static ArrayList LAST(Object[] obj) {
+	public static Object LAST(Object[] obj) {
 		if (isTS(obj[obj.length-1])) {
-			return (ArrayList)obj[obj.length-1];
+			return (Object)obj[obj.length-1];
 		} else {
 			throw new InvalidArgumentException(obj, Function.LAST);
 		}

@@ -112,4 +112,37 @@ public class CalcTest {
 		assertEquals(1, ((List)((Object[])res)[1]).get(0));
 		assertEquals(3, ((List)((Object[])res)[2]).get(0));
 	}
+	
+	@Test
+	public void test12() {
+		Object res = metricMath.execute("IF(FIRST(SORT(m8_9_10, AVG, DESC))>6, 1, 0)");
+		assertEquals(0, (int)((List)res).get(0));
+		assertEquals(1, (int)((List)res).get(1));
+		assertEquals(0, (int)((List)res).get(2));
+		assertEquals(1, (int)((List)res).get(3));
+	}
+	
+	@Test
+	public void test13() {
+		Object res = metricMath.execute("SLICE(SORT(m8_9_10, SUM, DESC), 0, 2)");
+		assertEquals(5, ((List)((Object[])res)[0]).get(0));
+		assertEquals(1, ((List)((Object[])res)[1]).get(0));
+	}
+	
+	@Test
+	public void test14() {
+		Object res = metricMath.execute("m7/STDDEV(m7)");
+		assertEquals(0.0, (double)((List)res).get(0), 0);
+		assertEquals(0.0, (double)((List)res).get(1), 0);
+		assertEquals(2.0, (double)((List)res).get(2), 0);
+		assertEquals(2.0, (double)((List)res).get(3), 0);
+	}
+	
+	@Test
+	public void test15() {
+		Object res = metricMath.execute("FLOOR(m4)");
+		assertEquals(3.0, (double)((List)res).get(0), 0);
+		assertEquals(3.0, (double)((List)res).get(1), 0);
+		assertEquals(3.0, (double)((List)res).get(2), 0);
+	}
 }
