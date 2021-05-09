@@ -5,14 +5,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import exceptions.NoMatchingOperatorFoundException;
 import exceptions.UnsupportedFunctionException;
 import model.Calc;
 import model.Function;
+import model.Operator;
+import model.SortOrder;
 
 public class MetricMath {
-	private Map<String, List> data;
+	private Map<String, Object> data;
 	
-	public MetricMath(Map<String, List> data) {
+	public MetricMath(Map<String, Object> data) {
 		this.data = data;
 	}
 	
@@ -28,11 +31,20 @@ public class MetricMath {
 		return getOperands(operands, operands.size());
 	}
 	
-	private void compute(String computer, Stack<Object> operands, Calc calc) throws Exception {
+	private void compute(String computer, Stack<String> computers, Stack<Object> operands, Calc calc) throws Exception {
 		try {
 			int operandCnt = Function.getOperator(computer).getParamCnt();
 			Method method = Calc.getMethod(computer, operandCnt);
 			List operandList = getOperands(operands, operandCnt);
+			
+			if (operandCnt == 1) {
+				try {
+					SortOrder.valueOf(operandList.get(0).toString());
+					operands.push(operandList.get(0).toString());
+					operands.push(computer);
+					return;
+				} catch (IllegalArgumentException e) {}
+			}
 			
 			switch(operandCnt) {
 			case 0:
@@ -72,7 +84,13 @@ public class MetricMath {
 		} else if (computer.equals(Function.POWER.name())) {
 			method = Calc.getMethod(computer, 2);
 		} else {
-			throw new UnsupportedFunctionException(computer);
+			try {
+				Operator op = Operator.getOperator(computer);
+				operands.push(Calc.condition(operands.pop(), op, operands.pop()));
+				return;
+			} catch (NoMatchingOperatorFoundException e) {
+				throw e;
+			}
 		}
 		
 		while (operands.size() != 1) {
@@ -111,6 +129,10 @@ public class MetricMath {
 				computers.push(""+expr.charAt(i));
 				break;
 			case ' ':
+				if (buf.isEmpty() == false) {
+					computers.push(buf.toString());
+					buf = new StringBuffer();
+				}
 				break;
 			default:
 				buf.append(expr.charAt(i));
@@ -124,11 +146,12 @@ public class MetricMath {
 		while (computers.isEmpty() == false) {
 			String computer = computers.pop();
 			try {
-				compute(computer, operands, calc);
+				compute(computer, computers, operands, calc);
 			} catch (Exception e) {
 				switch(computer) {
 				case "":
 				case ",":
+					break;
 				case ")":
 					operators.push(")");
 					break;
@@ -170,6 +193,18 @@ public class MetricMath {
 				case "/":
 				case "^":
 					operators.add(Function.getOperator(computer).name());
+					break;
+				case "==":
+				case "!=":
+				case "<=":
+				case ">=":
+				case "<":
+				case ">":
+				case "AND":
+				case "&&":
+				case "OR":
+				case "||":
+					operators.add(computer);
 					break;
 				default:
 					if (data.containsKey(computer)) {

@@ -13,9 +13,9 @@ public class ComputedList implements Comparable<ComputedList> {
 	
 	@Override
 	public int compareTo(ComputedList o) {
-		if (Calc.condition(computedValue, Operator.GreaterThan, o.getComputedValue())) {
+		if (Calc.boolCond(computedValue, Operator.GreaterThan, o.getComputedValue())) {
 			return sortOrder == SortOrder.ASC ? 1 : -1; 
-		} else if (Calc.condition(computedValue, Operator.LessThan, o.getComputedValue())) {
+		} else if (Calc.boolCond(computedValue, Operator.LessThan, o.getComputedValue())) {
 			return sortOrder == SortOrder.ASC ? -1 : 1;
 		} else {
 			return 0;

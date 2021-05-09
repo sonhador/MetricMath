@@ -33,11 +33,34 @@ public class Calc {
 	
 	private static boolean isNonDecimal(Object obj) {
 		try {
-			Long.parseLong(obj.toString());
+			Integer.parseInt(obj.toString());
 			return true;
 		} catch (NumberFormatException e) {
 			return false;
 		}
+	}
+	
+	private static boolean isBoolean(Object obj) {
+		if (obj.toString().toLowerCase().equals("true") ||
+			obj.toString().toLowerCase().equals("false")) {
+			return true;
+		}		
+		
+		return false;
+	}
+	
+	private static boolean isTrue(Object obj) {
+		if (isBoolean(obj)) {
+			return Boolean.valueOf(obj.toString());
+		} else if (isNonDecimal(obj)) {
+			if (Integer.parseInt(obj.toString()) == 0) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
+		return true;
 	}
 	
 	private static boolean isTS(Object obj) {
@@ -52,7 +75,7 @@ public class Calc {
 		ArrayList absList = new ArrayList();
 		for (Object elem : obj) {
 			if (isNonDecimal(elem)) {
-				absList.add(Math.abs((long)elem));
+				absList.add(Math.abs((int)elem));
 			} else {
 				absList.add(Math.abs((double)elem));
 			}
@@ -61,8 +84,8 @@ public class Calc {
 		return absList;
 	}
 	
-	private static ArrayList[] abs(Object[] obj) {
-		ArrayList []absListArray = new ArrayList[obj.length];
+	private static Object[] abs(Object[] obj) {
+		Object []absListArray = new Object[obj.length];
 		int idx = 0;
 		for (Object elem : obj) {
 			if (isTS(elem)) {
@@ -103,7 +126,7 @@ public class Calc {
 		ArrayList ceilList = new ArrayList();
 		for (Object elem : obj) {
 			if (isNonDecimal(elem)) {
-				ceilList.add((long)elem);
+				ceilList.add((int)elem);
 			} else {
 				ceilList.add(Math.ceil((double)elem));
 			}
@@ -112,8 +135,8 @@ public class Calc {
 		return ceilList;
 	}
 	
-	private static ArrayList[] ceil(Object[] obj) {
-		ArrayList []ceilListArray = new ArrayList[obj.length];
+	private static Object[] ceil(Object[] obj) {
+		Object[] ceilListArray = new Object[obj.length];
 		int idx = 0;
 		for (Object elem : obj) {
 			if (isTS(elem)) {
@@ -130,7 +153,7 @@ public class Calc {
 		ArrayList floorList = new ArrayList();
 		for (Object elem : obj) {
 			if (isNonDecimal(elem)) {
-				floorList.add((long)elem);
+				floorList.add((int)elem);
 			} else {
 				floorList.add(Math.floor((double)elem));
 			}
@@ -139,8 +162,8 @@ public class Calc {
 		return floorList;
 	}
 	
-	private static ArrayList[] floor(Object[] obj) {
-		ArrayList []floorListArray = new ArrayList[obj.length];
+	private static Object[] floor(Object[] obj) {
+		Object[] floorListArray = new Object[obj.length];
 		int idx = 0;
 		for (Object elem : obj) {
 			if (isTS(elem)) {
@@ -153,7 +176,7 @@ public class Calc {
 		return floorListArray;
 	}
 	
-	public static boolean condition(Object val1, Operator operator, Object val2) {
+	public static boolean boolCond(Object val1, Operator operator, Object val2) {
 		switch(operator) {
 			case EqualTo:
 				return val1.toString().equals(val2.toString());
@@ -161,43 +184,43 @@ public class Calc {
 				return val1.toString().equals(val2.toString()) == false;
 			case LessThanOrEqualTo:
 				if (isNonDecimal(val1) && isNonDecimal(val2)) {
-					return (long)val1 <= (long)val2;
+					return Integer.parseInt(val1.toString()) <= Integer.parseInt(val2.toString());
 				} else if (isNonDecimal(val1) && isNonDecimal(val2) == false) {
-					return (long)val1 <= (double)val2;
+					return Integer.parseInt(val1.toString()) <= Double.parseDouble(val2.toString());
 				} else if (isNonDecimal(val2) == false && isNonDecimal(val2)) {
-					return (double)val1 <= (long)val2;
+					return Double.parseDouble(val1.toString()) <= Integer.parseInt(val2.toString());
 				} else {
-					return (double)val1 <= (double)val2;
+					return Double.parseDouble(val1.toString()) <= Double.parseDouble(val2.toString());
 				}
 			case GreaterThanOrEqualTo:
 				if (isNonDecimal(val1) && isNonDecimal(val2)) {
-					return (long)val1 >= (long)val2;
+					return Integer.parseInt(val1.toString()) >= Integer.parseInt(val2.toString());
 				} else if (isNonDecimal(val1) && isNonDecimal(val2) == false) {
-					return (long)val1 >= (double)val2;
+					return Integer.parseInt(val1.toString()) >= Double.parseDouble(val2.toString());
 				} else if (isNonDecimal(val2) == false && isNonDecimal(val2)) {
-					return (double)val1 >= (long)val2;
+					return Double.parseDouble(val1.toString()) >= Integer.parseInt(val2.toString());
 				} else {
-					return (double)val1 >= (double)val2;
+					return Double.parseDouble(val1.toString()) >= Double.parseDouble(val2.toString());
 				}
 			case GreaterThan:
 				if (isNonDecimal(val1) && isNonDecimal(val2)) {
-					return (long)val1 > (long)val2;
+					return Integer.parseInt(val1.toString()) > Integer.parseInt(val2.toString());
 				} else if (isNonDecimal(val1) && isNonDecimal(val2) == false) {
-					return (long)val1 > (double)val2;
+					return Integer.parseInt(val1.toString()) > Double.parseDouble(val2.toString());
 				} else if (isNonDecimal(val2) == false && isNonDecimal(val2)) {
-					return (double)val1 > (long)val2;
+					return Double.parseDouble(val1.toString()) > Integer.parseInt(val2.toString());
 				} else {
-					return (double)val1 > (double)val2;
+					return Double.parseDouble(val1.toString()) > Double.parseDouble(val2.toString());
 				}
 			case LessThan:
 				if (isNonDecimal(val1) && isNonDecimal(val2)) {
-					return (long)val1 < (long)val2;
+					return Integer.parseInt(val1.toString()) < Integer.parseInt(val2.toString());
 				} else if (isNonDecimal(val1) && isNonDecimal(val2) == false) {
-					return (long)val1 < (double)val2;
+					return Integer.parseInt(val1.toString()) < Double.parseDouble(val2.toString());
 				} else if (isNonDecimal(val2) == false && isNonDecimal(val2)) {
-					return (double)val1 < (long)val2;
+					return Double.parseDouble(val1.toString()) < (int)val2;
 				} else {
-					return (double)val1 < (double)val2;
+					return Double.parseDouble(val1.toString()) < Double.parseDouble(val2.toString());
 				}
 			case AND:
 				return (boolean)val1 && (boolean)val2;
@@ -208,12 +231,29 @@ public class Calc {
 		}
 	}
 	
+	public static ArrayList condition(Object val1, Operator operator, Object val2) {
+		
+		if (isList(val1)) {
+			ArrayList newTS = new ArrayList();
+			for (Object obj : (List)val1) {
+				if (boolCond(obj, operator, val2)) {
+					newTS.add(1);
+				} else {
+					newTS.add(0);
+				}
+			}
+			return newTS;
+		} else {
+			throw new NoMatchingOperatorFoundException();
+		}
+	}
+	
 	private static Object max(List obj) {
 		return obj.stream().collect(Collectors.maxBy(
 			(o1, o2) -> {
-				if (Calc.condition(o1, Operator.GreaterThan, o2)) {
+				if (Calc.boolCond(o1, Operator.GreaterThan, o2)) {
 					return 1;
-				} else if (Calc.condition(o1, Operator.LessThan, o2)) {
+				} else if (Calc.boolCond(o1, Operator.LessThan, o2)) {
 					return -1;
 				} else {
 					return 0;
@@ -239,9 +279,9 @@ public class Calc {
 	private static Object min(List obj) {
 		return ((Optional)obj.stream().collect(Collectors.minBy(
 				(o1, o2) -> {
-					if (Calc.condition(o1, Operator.GreaterThan, o2)) {
+					if (Calc.boolCond(o1, Operator.GreaterThan, o2)) {
 						return 1;
-					} else if (Calc.condition(o1, Operator.LessThan, o2)) {
+					} else if (Calc.boolCond(o1, Operator.LessThan, o2)) {
 						return -1;
 					} else {
 						return 0;
@@ -264,19 +304,19 @@ public class Calc {
 		return maxList;
 	}
 	
-	private static ArrayList[] slice(Object[] obj, int start, int end) {
+	private static Object[] slice(Object[] obj, int start, int end) {
 		return Arrays.asList(obj)
 					 .stream()
 					 .skip(start)
 					 .limit(end - start)
-					 .collect(Collectors.toList()).toArray(new ArrayList[] {});
+					 .collect(Collectors.toList()).toArray(new Object[] {});
 	}
 	
-	private static ArrayList[] slice(Object[] obj, int start) {
+	private static Object[] slice(Object[] obj, int start) {
 		return slice(obj, start, ((Object[])obj).length);
 	}
 	
-	private static ArrayList[] sort(Object[] obj, Function function, SortOrder sortOrder) {
+	private static Object[] sort(Object[] obj, Function function, SortOrder sortOrder) {
 		ArrayList computedList;
 		switch(function) {
 		case AVG:
@@ -306,7 +346,7 @@ public class Calc {
 		return sortedList.stream()
 						 .map(l -> l.getComputeList())
 						 .collect(Collectors.toList())
-						 .toArray(new ArrayList[] {});
+						 .toArray(new Object[] {});
 	}
 	
 	private static double diffSquared(Object obj, double avg) {
@@ -408,13 +448,13 @@ public class Calc {
 				added.add(calcBinary(
 						obj1,
 					    isNonDecimal(obj) ? 
-					    		Long.parseLong(obj.toString()) : 
+					    		Integer.parseInt(obj.toString()) : 
 					    		Double.parseDouble(obj.toString()),
 						function)); 
 			} else {
 				added.add(calcBinary(					
 					    isNonDecimal(obj) ? 
-					    		Long.parseLong(obj.toString()) : 
+					    		Integer.parseInt(obj.toString()) : 
 					    		Double.parseDouble(obj.toString()),
 						obj1,
 						function)); 
@@ -436,7 +476,7 @@ public class Calc {
 				obj1val = 0;
 			} else {
 				obj1val = isNonDecimal(obj1.get(i)) ?
-						Long.parseLong(obj1.get(i).toString()) :
+						Integer.parseInt(obj1.get(i).toString()) :
 						Double.parseDouble(obj1.get(i).toString());
 			}
 			
@@ -444,7 +484,7 @@ public class Calc {
 				obj2val = 0;
 			} else {
 				obj2val = isNonDecimal(obj2.get(i)) ?
-						Long.parseLong(obj2.get(i).toString()) :
+						Integer.parseInt(obj2.get(i).toString()) :
 						Double.parseDouble(obj2.get(i).toString());
 			}
 			
@@ -458,8 +498,8 @@ public class Calc {
 		return added;
 	}
 	
-	private static ArrayList[] calcBinary(Number obj1, Object[] obj2, Function function, boolean flip) {
-		ArrayList[] added = new ArrayList[obj2.length];
+	private static Object[] calcBinary(Number obj1, Object[] obj2, Function function, boolean flip) {
+		Object[] added = new Object[obj2.length];
 		
 		int idx=0;
 		for (Object obj : obj2) {
@@ -469,8 +509,8 @@ public class Calc {
 		return added;
 	}
 	
-	private static ArrayList[] calcBinary(List obj1, Object[] obj2, Function function, boolean flip) {
-		ArrayList[] added = new ArrayList[obj2.length];
+	private static Object[] calcBinary(List obj1, Object[] obj2, Function function, boolean flip) {
+		Object[] added = new Object[obj2.length];
 		
 		int idx=0;
 		for (Object obj : obj2) {
@@ -489,35 +529,35 @@ public class Calc {
 			return calcBinary((List)obj2, (Object[])obj1, function, true);
 		} else if (isList(obj1)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj2.toString()), (List)obj1, function, false);
+				return calcBinary(Integer.parseInt(obj2.toString()), (List)obj1, function, false);
 			} else {
 				return calcBinary(Double.parseDouble(obj2.toString()), (List)obj1, function, false);
 			}
 		} else if (isList(obj2)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj1.toString()), (List)obj2, function, true);
+				return calcBinary(Integer.parseInt(obj1.toString()), (List)obj2, function, true);
 			} else {
 				return calcBinary(Double.parseDouble(obj1.toString()), (List)obj2, function, true);
 			}
 		} else if (isArray(obj1)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj1.toString()), (Object[])obj2, function, false);
+				return calcBinary(Integer.parseInt(obj1.toString()), (Object[])obj2, function, false);
 			} else {
 				return calcBinary(Double.parseDouble(obj1.toString()), (Object[])obj2, function, false);
 			}
 		} else if (isArray(obj2)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj1.toString()), (Object[])obj2, function, true);
+				return calcBinary(Integer.parseInt(obj1.toString()), (Object[])obj2, function, true);
 			} else {
 				return calcBinary(Double.parseDouble(obj1.toString()), (Object[])obj2, function, true);
 			}
 		} else {
 			if (isNonDecimal(obj1) && isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj1.toString()), Long.parseLong(obj2.toString()), function);
+				return calcBinary(Integer.parseInt(obj1.toString()), Integer.parseInt(obj2.toString()), function);
 			} else if (isNonDecimal(obj1) && isNonDecimal(obj2) == false) {
-				return calcBinary(Long.parseLong(obj1.toString()), Double.parseDouble(obj2.toString()), function);
+				return calcBinary(Integer.parseInt(obj1.toString()), Double.parseDouble(obj2.toString()), function);
 			} else if (isNonDecimal(obj1) == false && isNonDecimal(obj2)) {
-				return calcBinary(Double.parseDouble(obj1.toString()), Long.parseLong(obj2.toString()), function);
+				return calcBinary(Double.parseDouble(obj1.toString()), Integer.parseInt(obj2.toString()), function);
 			} else {
 				return calcBinary(Double.parseDouble(obj1.toString()), Double.parseDouble(obj2.toString()), function);
 			}
@@ -592,7 +632,7 @@ public class Calc {
 		if (id != null) {
 			return metrics.get(id);
 		} else {
-			ArrayList[] ts = new ArrayList[metrics.keySet().size()];
+			Object[] ts = new Object[metrics.keySet().size()];
 			int idx = 0;
 			for (String key : metrics.keySet()) {
 				ts[idx++] = metrics.get(key);
@@ -638,6 +678,105 @@ public class Calc {
 		}
 	}
 	
+	public static Object IF(Object obj, Object v1, Object v2) {
+		ArrayList newTS = new ArrayList();
+		
+		if (isBoolean(obj)) {
+			if (Boolean.valueOf(obj.toString())) {
+				newTS.add(v1);
+			} else {
+				newTS.add(v2);
+			}
+		} else if (isList(obj)) {
+			List objList = (List)obj;
+			
+			if (isList(v1) && isList(v2)) {
+				List v1List = (List)v1;
+				List v2List = (List)v2;
+				
+				for (int i=0; i<objList.size(); i++) {
+					Object v1Obj;
+					Object v2Obj;
+					boolean objBool = isTrue(objList.get(i));
+					
+					if (i >= v1List.size()) {
+						v1Obj = 0;
+					} else {
+						v1Obj = v1List.get(i);
+					}
+					
+					if (i >= v2List.size()) {
+						v2Obj = null;
+					} else {
+						v2Obj = v2List.get(i);
+					}
+					
+					if (objBool) {
+						newTS.add(v1Obj);
+					} else {
+						if (v2Obj != null) {
+							newTS.add(v2Obj);
+						}
+					}
+				}
+			} else if (isList(v1)) {
+				List v1List = (List)v1;
+				
+				for (int i=0; i<objList.size(); i++) {
+					Object v1Obj;
+					boolean objBool = isTrue(objList.get(i));
+					
+					if (i >= v1List.size()) {
+						v1Obj = 0;
+					} else {
+						v1Obj = v1List.get(i);
+					}
+					
+					if (objBool) {
+						newTS.add(v1Obj);
+					} else {
+						newTS.add(v2);
+					}
+				}
+			} else if (isList(v2)) {
+				List v2List = (List)v2;
+				
+				for (int i=0; i<objList.size(); i++) {
+					Object v2Obj;
+					boolean objBool = isTrue(objList.get(i));
+					
+					if (i >= v2List.size()) {
+						v2Obj = null;
+					} else {
+						v2Obj = v2List.get(i);
+					}
+					
+					if (objBool) {
+						newTS.add(v1);
+					} else {
+						if (v2Obj != null) {
+							newTS.add(v2Obj);
+						}
+					}
+				}
+			} else {
+				for (int i=0; i<objList.size(); i++) {
+					boolean objBool = isTrue(objList.get(i));
+					
+					if (objBool) {
+						newTS.add(v1);
+					} else {
+						newTS.add(v2);
+					}
+				}
+			}
+		} else {
+			throw new InvalidArgumentException(obj, Function.IF);
+		}
+		
+		return newTS;
+	}
+	
 	public static Object IF(Object obj, String operator, Object s, Object v1, Object v2) {
 		ArrayList newTS = new ArrayList();
 
@@ -645,7 +784,7 @@ public class Calc {
 			Operator op = Operator.getOperator(operator);
 
 			for (Object o : (List)obj) {
-				if (condition(o, op, s)) {
+				if (boolCond(o, op, s)) {
 					newTS.add(v1);
 				} else {
 					newTS.add(v2);

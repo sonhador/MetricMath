@@ -11,7 +11,7 @@ public enum Function {
 	FIRST(1),
 	LAST(1),
 	FLOOR(1),
-	IF(5),
+	IF(3),
 //	INSIGHT_RULE_METRIC,
 	MAX(1),
 	METRIC_COUNT(1),
