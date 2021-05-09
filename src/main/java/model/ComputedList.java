@@ -1,13 +1,11 @@
 package model;
 
-import java.util.List;
-
 public class ComputedList implements Comparable<ComputedList> {
 	private Object computedValue;
-	private List computeList;
+	private Object computeList;
 	private SortOrder sortOrder;
 	
-	public ComputedList(List computeList, Object computedValue, SortOrder sortOrder) {
+	public ComputedList(Object computeList, Object computedValue, SortOrder sortOrder) {
 		this.computeList = computeList;
 		this.computedValue = computedValue;
 		this.sortOrder = sortOrder;
@@ -28,7 +26,7 @@ public class ComputedList implements Comparable<ComputedList> {
 		return computedValue;
 	}
 	
-	public List getComputeList() {
+	public Object getComputeList() {
 		return computeList;
 	}
 }

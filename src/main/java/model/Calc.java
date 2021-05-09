@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import exceptions.InvalidArgumentException;
@@ -13,16 +14,17 @@ import exceptions.NoMatchingOperatorFoundException;
 import exceptions.UnsupportedFunctionException;
 
 public class Calc {
-	private static boolean isList(Object obj) {
-		if (obj.getClass().getSimpleName().equals(ArrayList.class.getSimpleName())) {
+	public static boolean isList(Object obj) {
+		if (obj.getClass().getSimpleName().equals(ArrayList.class.getSimpleName()) ||
+			obj.getClass().getSimpleName().equals(List.class.getSimpleName())) {
 			return true;
 		}
 		
 		return false;
 	}
 	
-	private static boolean isArray(Object obj) {
-		if (obj.getClass().getSimpleName().equals(ArrayList.class.getSimpleName()+"[]")) {
+	public static boolean isArray(Object obj) {
+		if (obj.getClass().getSimpleName().endsWith("[]")) {
 			return true;
 		}
 		
@@ -59,7 +61,7 @@ public class Calc {
 		return absList;
 	}
 	
-	private static ArrayList[] abs(List[] obj) {
+	private static ArrayList[] abs(Object[] obj) {
 		ArrayList []absListArray = new ArrayList[obj.length];
 		int idx = 0;
 		for (Object elem : obj) {
@@ -83,7 +85,7 @@ public class Calc {
 						  o -> Double.parseDouble(o.toString())));
 	}
 	
-	private static ArrayList avg(List[] obj) {
+	private static ArrayList avg(Object[] obj) {
 		ArrayList avgList = new ArrayList();
 		int idx = 0;
 		for (Object elem : obj) {
@@ -110,7 +112,7 @@ public class Calc {
 		return ceilList;
 	}
 	
-	private static ArrayList[] ceil(List[] obj) {
+	private static ArrayList[] ceil(Object[] obj) {
 		ArrayList []ceilListArray = new ArrayList[obj.length];
 		int idx = 0;
 		for (Object elem : obj) {
@@ -137,7 +139,7 @@ public class Calc {
 		return floorList;
 	}
 	
-	private static ArrayList[] floor(List[] obj) {
+	private static ArrayList[] floor(Object[] obj) {
 		ArrayList []floorListArray = new ArrayList[obj.length];
 		int idx = 0;
 		for (Object elem : obj) {
@@ -220,7 +222,7 @@ public class Calc {
 		));
 	}
 	
-	private static ArrayList max(List[] obj) {
+	private static ArrayList max(Object[] obj) {
 		ArrayList maxList = new ArrayList();
 		
 		for (Object o : obj) {
@@ -235,20 +237,20 @@ public class Calc {
 	}
 	
 	private static Object min(List obj) {
-		return obj.stream().collect(Collectors.minBy(
-			(o1, o2) -> {
-				if (Calc.condition(o1, Operator.GreaterThan, o2)) {
-					return 1;
-				} else if (Calc.condition(o1, Operator.LessThan, o2)) {
-					return -1;
-				} else {
-					return 0;
+		return ((Optional)obj.stream().collect(Collectors.minBy(
+				(o1, o2) -> {
+					if (Calc.condition(o1, Operator.GreaterThan, o2)) {
+						return 1;
+					} else if (Calc.condition(o1, Operator.LessThan, o2)) {
+						return -1;
+					} else {
+						return 0;
+					}
 				}
-			}
-		));
+			))).get();
 	}
 	
-	private static ArrayList min(List[] obj) {
+	private static ArrayList min(Object[] obj) {
 		ArrayList maxList = new ArrayList();
 		
 		for (Object o : obj) {
@@ -262,19 +264,19 @@ public class Calc {
 		return maxList;
 	}
 	
-	private static ArrayList[] slice(List[] obj, int start, int end) {
-		return Arrays.asList((ArrayList[])obj)
+	private static ArrayList[] slice(Object[] obj, int start, int end) {
+		return Arrays.asList(obj)
 					 .stream()
 					 .skip(start)
 					 .limit(end - start)
 					 .collect(Collectors.toList()).toArray(new ArrayList[] {});
 	}
 	
-	private static ArrayList[] slice(List[] obj, int start) {
-		return slice(obj, start, ((List[])obj).length);
+	private static ArrayList[] slice(Object[] obj, int start) {
+		return slice(obj, start, ((Object[])obj).length);
 	}
 	
-	private static ArrayList[] sort(List[] obj, Function function, SortOrder sortOrder) {
+	private static ArrayList[] sort(Object[] obj, Function function, SortOrder sortOrder) {
 		ArrayList computedList;
 		switch(function) {
 		case AVG:
@@ -295,7 +297,7 @@ public class Calc {
 		
 		List<ComputedList> sortedList = new ArrayList<>();
 		int idx = 0;
-		for (List list : obj) {
+		for (Object list : obj) {
 			sortedList.add(new ComputedList(list, computedList.get(idx++), sortOrder));
 		}
 		
@@ -319,11 +321,11 @@ public class Calc {
 		return Math.sqrt(sum / obj.size());
 	}
 	
-	private static ArrayList stddev(List[] obj) {
+	private static ArrayList stddev(Object[] obj) {
 		ArrayList stddevList = new ArrayList();
 		
-		for (List l : obj) {
-			stddevList.add(stddev(l));
+		for (Object l : obj) {
+			stddevList.add(stddev((List)l));
 		}
 		
 		return stddevList;
@@ -335,11 +337,11 @@ public class Calc {
 						  	o -> Double.parseDouble(o.toString())));
 	}
 	
-	private static ArrayList sum(List[] obj) {
+	private static ArrayList sum(Object[] obj) {
 		ArrayList sumList = new ArrayList();
 		
-		for (List l : obj) {
-			sumList.add(sum(l));
+		for (Object l : obj) {
+			sumList.add(sum((List)l));
 		}
 		
 		return sumList;
@@ -398,22 +400,31 @@ public class Calc {
 		}
 	}
 	
-	private static ArrayList calcBinary(Number obj1, List obj2, Function function) {
+	private static ArrayList calcBinary(Number obj1, List obj2, Function function, boolean flip) {
 		ArrayList added = new ArrayList();
 		
 		for (Object obj : obj2) {
-			added.add(calcBinary(					
-				    isNonDecimal(obj) ? 
-				    		Long.parseLong(obj.toString()) : 
-				    		Double.parseDouble(obj.toString()),
-					obj1,
-					function)); 
+			if (flip) {
+				added.add(calcBinary(
+						obj1,
+					    isNonDecimal(obj) ? 
+					    		Long.parseLong(obj.toString()) : 
+					    		Double.parseDouble(obj.toString()),
+						function)); 
+			} else {
+				added.add(calcBinary(					
+					    isNonDecimal(obj) ? 
+					    		Long.parseLong(obj.toString()) : 
+					    		Double.parseDouble(obj.toString()),
+						obj1,
+						function)); 
+			}
 		}
 		
 		return added;
 	}
 	
-	private static ArrayList calcBinary(List obj1, List obj2, Function function) {
+	private static ArrayList calcBinary(List obj1, List obj2, Function function, boolean flip) {
 		ArrayList added = new ArrayList();
 		int length = Math.max(obj1.size(), obj2.size());
 		
@@ -437,29 +448,33 @@ public class Calc {
 						Double.parseDouble(obj2.get(i).toString());
 			}
 			
-			added.add(calcBinary(obj1val, obj2val, function));
+			if (flip) {
+				added.add(calcBinary(obj2val, obj1val, function));
+			} else {
+				added.add(calcBinary(obj1val, obj2val, function));
+			}
 		}
 		
 		return added;
 	}
 	
-	private static ArrayList[] calcBinary(Number obj1, List[] obj2, Function function) {
+	private static ArrayList[] calcBinary(Number obj1, Object[] obj2, Function function, boolean flip) {
 		ArrayList[] added = new ArrayList[obj2.length];
 		
 		int idx=0;
-		for (List obj : obj2) {
-			added[idx++] = calcBinary(obj1, obj, function);
+		for (Object obj : obj2) {
+			added[idx++] = calcBinary(obj1, (List)obj, function, flip);
 		}
 		
 		return added;
 	}
 	
-	private static ArrayList[] calcBinary(List obj1, List[] obj2, Function function) {
+	private static ArrayList[] calcBinary(List obj1, Object[] obj2, Function function, boolean flip) {
 		ArrayList[] added = new ArrayList[obj2.length];
 		
 		int idx=0;
-		for (List obj : obj2) {
-			added[idx++] = calcBinary(obj1, obj, function);
+		for (Object obj : obj2) {
+			added[idx++] = calcBinary(obj1, (List)obj, function, flip);
 		}
 		
 		return added;
@@ -467,34 +482,34 @@ public class Calc {
 	
 	public static Object calcBinary(Object obj1, Object obj2, Function function) {	
 		if (isList(obj1) && isList(obj2)) {
-			return calcBinary((List)obj1, (List)obj2, function);
+			return calcBinary((List)obj1, (List)obj2, function, false);
 		} else if (isList(obj1) && isArray(obj2)) {
-			return calcBinary((List)obj1, (List[])obj2, function);
+			return calcBinary((List)obj1, (Object[])obj2, function, false);
 		} else if (isArray(obj1) && isList(obj2)) {
-			return calcBinary((List)obj2, (List[])obj1, function);
+			return calcBinary((List)obj2, (Object[])obj1, function, true);
 		} else if (isList(obj1)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj2.toString()), (List)obj1, function);
+				return calcBinary(Long.parseLong(obj2.toString()), (List)obj1, function, false);
 			} else {
-				return calcBinary(Double.parseDouble(obj2.toString()), (List)obj1, function);
+				return calcBinary(Double.parseDouble(obj2.toString()), (List)obj1, function, false);
 			}
 		} else if (isList(obj2)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj1.toString()), (List)obj2, function);
+				return calcBinary(Long.parseLong(obj1.toString()), (List)obj2, function, true);
 			} else {
-				return calcBinary(Double.parseDouble(obj1.toString()), (List)obj2, function);
+				return calcBinary(Double.parseDouble(obj1.toString()), (List)obj2, function, true);
 			}
 		} else if (isArray(obj1)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj1.toString()), (List[])obj2, function);
+				return calcBinary(Long.parseLong(obj1.toString()), (Object[])obj2, function, false);
 			} else {
-				return calcBinary(Double.parseDouble(obj1.toString()), (List[])obj2, function);
+				return calcBinary(Double.parseDouble(obj1.toString()), (Object[])obj2, function, false);
 			}
 		} else if (isArray(obj2)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Long.parseLong(obj1.toString()), (List[])obj2, function);
+				return calcBinary(Long.parseLong(obj1.toString()), (Object[])obj2, function, true);
 			} else {
-				return calcBinary(Double.parseDouble(obj1.toString()), (List[])obj2, function);
+				return calcBinary(Double.parseDouble(obj1.toString()), (Object[])obj2, function, true);
 			}
 		} else {
 			if (isNonDecimal(obj1) && isNonDecimal(obj2)) {
@@ -517,7 +532,7 @@ public class Calc {
 		return calcBinary(obj1, obj2, Function.SUBTRACT);
 	}
 	
-	public static Object MULTIPY(Object obj1, Object obj2) {
+	public static Object MULTIPLY(Object obj1, Object obj2) {
 		return calcBinary(obj1, obj2, Function.MULTIPLY);
 	}
 	
@@ -533,7 +548,7 @@ public class Calc {
 		if (isList(obj)) {
 			return sum((List)obj);
 		} else if (isArray(obj)) {
-			return sum((List[])obj);
+			return sum((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.SUM);
 		}
@@ -543,7 +558,7 @@ public class Calc {
 		if (isList(obj)) {
 			return stddev((List)obj);
 		} else if (isArray(obj)) {
-			return stddev((List[])obj);
+			return stddev((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.STDDEV);
 		}
@@ -551,7 +566,7 @@ public class Calc {
 	
 	public static Object SORT(Object obj, String function, String sortOrder) {
 		if (isArray(obj)) {
-			return sort((List[])obj, Function.valueOf(function), SortOrder.valueOf(sortOrder));
+			return sort((Object[])obj, Function.valueOf(function), SortOrder.valueOf(sortOrder));
 		} else {
 			throw new InvalidArgumentException(obj, Function.SORT);
 		}
@@ -559,7 +574,7 @@ public class Calc {
 	
 	public static Object SLICE(Object obj, int start, int end) {
 		if (isArray(obj)) {
-			return slice((List[])obj, start, end);
+			return slice((Object[])obj, start, end);
 		} else {
 			throw new InvalidArgumentException(obj, Function.SLICE);
 		}
@@ -567,7 +582,7 @@ public class Calc {
 	
 	public static Object SLICE(Object obj, int start) {
 		if (isArray(obj)) {
-			return slice((List[])obj, start);
+			return slice((Object[])obj, start);
 		} else {
 			throw new InvalidArgumentException(obj, Function.SLICE);
 		}
@@ -589,7 +604,7 @@ public class Calc {
 	public static Object METRIC_COUNT(Object obj) {
 		if (isArray(obj)) {
 			int total = 0;
-			for (Object o : (List[])obj) {
+			for (Object o : (Object[])obj) {
 				if (isTS(o)) {
 					total += ((List)o).size();
 				} else {
@@ -607,7 +622,7 @@ public class Calc {
 		if (isTS(obj)) {
 			return min((List)obj);
 		} else if (isArray(obj)) {
-			return min((List[])obj);
+			return min((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.MAX);
 		}
@@ -617,7 +632,7 @@ public class Calc {
 		if (isTS(obj)) {
 			return max((List)obj);
 		} else if (isArray(obj)) {
-			return max((List[])obj);
+			return max((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.MAX);
 		}
@@ -647,13 +662,13 @@ public class Calc {
 		if (isTS(obj)) {
 			return floor((List)obj);
 		} else if (isTSArray(obj)) {
-			return floor((List[])obj);
+			return floor((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.FLOOR);
 		}
 	}
 	
-	public static ArrayList FIRST(List[] obj) {
+	public static ArrayList FIRST(Object[] obj) {
 		if (isTS(obj[0])) {
 			return (ArrayList)obj[0];
 		} else {
@@ -661,7 +676,7 @@ public class Calc {
 		}
 	}
 	
-	public static ArrayList LAST(List[] obj) {
+	public static ArrayList LAST(Object[] obj) {
 		if (isTS(obj[obj.length-1])) {
 			return (ArrayList)obj[obj.length-1];
 		} else {
@@ -673,7 +688,7 @@ public class Calc {
 		if (isTS(obj)) {
 			return ceil((List)obj);
 		} else if (isTSArray(obj)) {
-			return ceil((List[])obj);
+			return ceil((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.CEIL);
 		}
@@ -683,7 +698,7 @@ public class Calc {
 		if (isTS(obj)) {
 			return abs((List)obj);
 		} else if (isTSArray(obj)) {
-			return abs((List[])obj);
+			return abs((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.ABS);
 		}
@@ -693,7 +708,7 @@ public class Calc {
 		if (isTS(obj)) {
 			return avg((List)obj);
 		} else if (isTSArray(obj)) {
-			return avg((List[])obj);
+			return avg((Object[])obj);
 		} else {
 			throw new InvalidArgumentException(obj, Function.AVG);
 		}
