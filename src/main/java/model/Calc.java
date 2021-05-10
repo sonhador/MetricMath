@@ -546,19 +546,19 @@ public class Calc {
 				return calcBinary(Double.parseDouble(obj2.toString()), (List)obj1, function, false);
 			}
 		} else if (isList(obj2)) {
-			if (isNonDecimal(obj2)) {
+			if (isNonDecimal(obj1)) {
 				return calcBinary(Integer.parseInt(obj1.toString()), (List)obj2, function, true);
 			} else {
 				return calcBinary(Double.parseDouble(obj1.toString()), (List)obj2, function, true);
 			}
 		} else if (isArray(obj1)) {
 			if (isNonDecimal(obj2)) {
-				return calcBinary(Integer.parseInt(obj1.toString()), (Object[])obj2, function, false);
+				return calcBinary(Integer.parseInt(obj2.toString()), (Object[])obj1, function, false);
 			} else {
-				return calcBinary(Double.parseDouble(obj1.toString()), (Object[])obj2, function, false);
+				return calcBinary(Double.parseDouble(obj2.toString()), (Object[])obj1, function, false);
 			}
 		} else if (isArray(obj2)) {
-			if (isNonDecimal(obj2)) {
+			if (isNonDecimal(obj1)) {
 				return calcBinary(Integer.parseInt(obj1.toString()), (Object[])obj2, function, true);
 			} else {
 				return calcBinary(Double.parseDouble(obj1.toString()), (Object[])obj2, function, true);
