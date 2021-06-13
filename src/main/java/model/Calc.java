@@ -40,6 +40,20 @@ public class Calc {
 		}
 	}
 	
+	private static boolean isNumeric(Object obj) {
+		try {
+			Long.parseLong(obj.toString());
+			return true;
+		} catch (NumberFormatException e) {
+			try {
+				Double.parseDouble(obj.toString());
+				return true;
+			} catch (NumberFormatException e1) {
+				return false;
+			}
+		}
+	}
+	
 	private static Object numberFirst(Object obj) {
 		try {
 			return Integer.parseInt(obj.toString());
@@ -244,8 +258,18 @@ public class Calc {
 	}
 	
 	public static ArrayList condition(Object val1, Operator operator, Object val2) {
-		
-		if (isList(val1)) {
+		if (isList(val1) && isList(val2)) {
+			int length = Math.min(((List)val1).size(), ((List)val2).size());
+			ArrayList newTS = new ArrayList();
+			for (int i=0; i<length; i++) {
+				if (boolCond(((List)val1).get(i), operator, ((List)val2).get(i))) {
+					newTS.add(true);
+				} else {
+					newTS.add(false);
+				}
+			}
+			return newTS;
+		} else if (isList(val1)) {
 			ArrayList newTS = new ArrayList();
 			for (Object obj : (List)val1) {
 				if (boolCond(obj, operator, val2)) {
@@ -253,6 +277,14 @@ public class Calc {
 				} else {
 					newTS.add(0);
 				}
+			}
+			return newTS;
+		} else if (isNumeric(val1)) {
+			ArrayList newTS = new ArrayList();
+			if (boolCond(val1, operator, val2)) {
+				newTS.add(true);
+			} else {
+				newTS.add(false);
 			}
 			return newTS;
 		} else {

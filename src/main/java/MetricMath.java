@@ -187,7 +187,7 @@ public class MetricMath {
 				computers.push(""+expr.charAt(i));
 				break;
 			case ' ':
-				if (buf.isEmpty() == false) {
+				if (buf.length() > 0) {
 					computers.push(buf.toString());
 					buf = new StringBuffer();
 				}
@@ -197,7 +197,7 @@ public class MetricMath {
 			}
 		}
 		
-		if (buf.isEmpty() == false) {
+		if (buf.length() > 0) {
 			computers.push(buf.toString());
 		}
 		
